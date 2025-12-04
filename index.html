@@ -2,13 +2,23 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Calculadora de Días de Clase y Costo Total</title>
+  <title>Calculadora de Clases y Costo - Grupo de Estudio Nostradamus</title>
+
   <style>
+    :root {
+      --color-bg: #f4f4f4;
+      --color-primary: #008B8F;     /* Turquesa Nostradamus */
+      --color-secondary: #111111;   /* Negro DAMUS */
+      --color-card-bg: #ffffff;
+      --color-error: #c0392b;
+      --shadow-soft: 0 4px 12px rgba(0,0,0,0.12);
+    }
+
     body {
       font-family: Arial, sans-serif;
-      background: #f5f5f5;
+      background: var(--color-bg);
       margin: 0;
-      padding: 0;
+      padding: 20px;
       display: flex;
       justify-content: center;
       align-items: center;
@@ -16,85 +26,103 @@
     }
 
     .container {
-      background: #ffffff;
-      padding: 20px 25px;
-      border-radius: 10px;
-      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-      max-width: 420px;
+      background: var(--color-card-bg);
+      padding: 24px 26px;
+      border-radius: 16px;
+      box-shadow: var(--shadow-soft);
+      max-width: 460px;
       width: 100%;
+      text-align: center;
+    }
+
+    .logo {
+      width: 240px;
+      margin: 0 auto 10px;
     }
 
     h1 {
       font-size: 20px;
-      margin-bottom: 15px;
-      text-align: center;
+      margin: 8px 0 18px;
+      color: var(--color-primary);
+      font-weight: 900;
     }
 
     label {
       display: block;
-      margin-top: 10px;
+      margin-top: 12px;
       font-weight: bold;
+      color: #333;
+      text-align: left;
     }
 
     input[type="date"],
     input[type="number"] {
       width: 100%;
-      padding: 8px;
-      margin-top: 5px;
-      border-radius: 5px;
+      padding: 9px;
+      border-radius: 8px;
       border: 1px solid #ccc;
-      box-sizing: border-box;
+      margin-top: 5px;
+      font-size: 15px;
     }
 
     button {
-      margin-top: 15px;
+      margin-top: 18px;
       width: 100%;
-      padding: 10px;
+      padding: 12px;
       border: none;
-      border-radius: 5px;
-      background: #007bff;
+      border-radius: 8px;
+      background: var(--color-primary);
       color: #fff;
       font-size: 16px;
+      font-weight: bold;
       cursor: pointer;
     }
 
     button:hover {
-      background: #0056b3;
+      background: #007277;
     }
 
     .resultado {
-      margin-top: 15px;
-      padding: 10px;
-      border-radius: 5px;
-      background: #f0f8ff;
-      border: 1px solid #b3d7ff;
-      font-size: 14px;
+      margin-top: 16px;
+      padding: 12px;
+      border-radius: 12px;
+      background: #e7f8f9;
+      border: 1px solid #b3e4e6;
+      font-size: 15px;
+      color: var(--color-secondary);
+      text-align: left;
     }
 
     .error {
-      color: #c0392b;
+      margin-top: 12px;
+      color: var(--color-error);
       font-weight: bold;
-      margin-top: 10px;
     }
   </style>
 </head>
 <body>
-  <div class="container">
-    <h1>Calculadora de Clases y Costo</h1>
 
-    <label for="inicio">Fecha de inicio:</label>
+  <div class="container">
+
+    <!-- Logo oficial -->
+    <img src="LOGO-GNOSTRADAMUS-2023 - copia.png" class="logo">
+
+    <h1>Calculadora de Días de Clase y Costo</h1>
+
+    <label>Fecha de inicio:</label>
     <input type="date" id="inicio">
 
-    <label for="fin">Fecha de fin:</label>
+    <label>Fecha de fin:</label>
     <input type="date" id="fin">
 
-    <label for="costoDia">Costo por día (S/):</label>
-    <input type="number" id="costoDia" step="0.01" min="0">
+    <label>Costo por día (S/):</label>
+    <input type="number" id="costoDia" step="0.01" placeholder="Ej: 14.29">
 
-    <button onclick="calcular()">Calcular</button>
+    <button onclick="calcular()">Calcular total</button>
 
     <div id="mensajeError" class="error"></div>
     <div id="resultado" class="resultado" style="display:none;"></div>
+
   </div>
 
   <script>
@@ -108,18 +136,16 @@
 
       mensajeError.textContent = '';
       resultadoDiv.style.display = 'none';
-      resultadoDiv.textContent = '';
 
-      // Validar fechas
+      // Validaciones
       if (!inicioInput || !finInput) {
         mensajeError.textContent = 'Por favor, ingresa ambas fechas.';
         return;
       }
 
-      // Validar costo por día
       const costoDia = parseFloat(costoDiaInput);
       if (isNaN(costoDia) || costoDia < 0) {
-        mensajeError.textContent = 'Por favor, ingresa un costo por día válido (mayor o igual a 0).';
+        mensajeError.textContent = 'Ingresa un costo por día válido.';
         return;
       }
 
@@ -127,33 +153,28 @@
       const fin = new Date(finInput);
 
       if (fin < inicio) {
-        mensajeError.textContent = 'La fecha final no puede ser anterior a la fecha de inicio.';
+        mensajeError.textContent = 'La fecha final no puede ser menor que la inicial.';
         return;
       }
 
       let diasClase = 0;
       let fechaActual = new Date(inicio);
 
-      // Contar días de clase (lunes a sábado, excluyendo domingos)
       while (fechaActual <= fin) {
-        const diaSemana = fechaActual.getDay(); // 0=Domingo, 1=Lunes, ..., 6=Sábado
-        if (diaSemana !== 0) { // excluimos solo domingo
-          diasClase++;
-        }
+        if (fechaActual.getDay() !== 0) diasClase++; // Excluye domingos
         fechaActual.setDate(fechaActual.getDate() + 1);
       }
 
-      const costoTotal = diasClase * costoDia;
-      const costoTotalFormateado = costoTotal.toFixed(2);
+      const total = diasClase * costoDia;
 
       resultadoDiv.style.display = 'block';
       resultadoDiv.innerHTML = `
-        Entre el <strong>${inicioInput}</strong> y el <strong>${finInput}</strong><br>
-        hay <strong>${diasClase}</strong> días de clase (lunes a sábado).<br><br>
-        Costo por día: <strong>S/ ${costoDia.toFixed(2)}</strong><br>
-        <strong>Total a pagar: S/ ${costoTotalFormateado}</strong>
+        <strong>Días de clase:</strong> ${diasClase}<br>
+        <strong>Costo por día:</strong> S/ ${costoDia.toFixed(2)}<br><br>
+        <strong>Total a pagar:</strong> <span style="color:#008B8F;">S/ ${total.toFixed(2)}</span>
       `;
     }
   </script>
+
 </body>
 </html>
