@@ -148,8 +148,8 @@
         return;
       }
 
-      const inicio = new Date(inicioInput);
-      const fin = new Date(finInput);
+      const inicio = new Date(inicioInput + "T00:00:00");
+      const fin = new Date(finInput + "T00:00:00");
 
       if (fin < inicio) {
         mensajeError.textContent = 'La fecha final no puede ser menor que la inicial.';
@@ -162,24 +162,28 @@
       let clasesPorMes = {};
 
       while (fechaActual <= fin) {
-        if (fechaActual.getDay() !== 0) { // Excluye domingos
+        const dia = fechaActual.getDay(); // 0=Dom, 1=Lun, ..., 6=Sab
+
+        // Solo lunes a sábado
+        if (dia >= 1 && dia <= 6) {
           diasClase++;
 
-          // Construir clave Año-Mes
+          // Construir clave: "DICIEMBRE 2025"
           let year = fechaActual.getFullYear();
-          let month = fechaActual.toLocaleString('es-ES', { month: 'long' });
+          let month = fechaActual.toLocaleString('es-ES', { month: 'long' }).toUpperCase();
 
-          let clave = `${month.toUpperCase()} ${year}`;
+          let clave = `${month} ${year}`;
 
           if (!clasesPorMes[clave]) clasesPorMes[clave] = 0;
           clasesPorMes[clave]++;
         }
+
         fechaActual.setDate(fechaActual.getDate() + 1);
       }
 
       const total = diasClase * costoDia;
 
-      // Construir texto con desglose por mes
+      // Crear texto del desglose
       let desglose = "📅 *CLASES POR MES*\n\n";
       for (let m in clasesPorMes) {
         desglose += `${m}: ${clasesPorMes[m]} clases\n`;
