@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Calculadora de Días de Clase</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f5f5f5;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      background: #ffffff;
+      padding: 20px 25px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+      max-width: 420px;
+      width: 100%;
+    }
+
+    h1 {
+      font-size: 20px;
+      margin-bottom: 15px;
+      text-align: center;
+    }
+
+    label {
+      display: block;
+      margin-top: 10px;
+      font-weight: bold;
+    }
+
+    input[type="date"], input[type="number"] {
+      width: 100%;
+      padding: 8px;
+      margin-top: 5px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+    }
+
+    button {
+      margin-top: 15px;
+      width: 100%;
+      padding: 10px;
+      border: none;
+      border-radius: 5px;
+      background: #007bff;
+      color: #fff;
+      font-size: 16px;
+      cursor: pointer;
+    }
+
+    button:hover {
+      background: #0056b3;
+    }
+
+    .resultado {
+      margin-top: 15px;
+      padding: 10px;
+      border-radius: 5px;
+      background: #f0f8ff;
+      border: 1px solid #b3d7ff;
+      font-size: 14px;
+    }
+
+    .error {
+      color: #c0392b;
+      font-weight: bold;
+      margin-top: 10px;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Calculadora de Días de Clase</h1>
+
+    <label for="inicio">Fecha de inicio:</label>
+    <input type="date" id="inicio">
+
+    <label for="fin">Fecha de fin:</label>
+    <input type="date" id="fin">
+
+    <button onclick="calcularDias()">Calcular días de clase</button>
+
+    <div id="mensajeError" class="error"></div>
+    <div id="resultado" class="resultado" style="display:none;"></div>
+  </div>
+
+  <script>
+    function calcularDias() {
+      const inicioInput = document.getElementById('inicio').value;
+      const finInput = document.getElementById('fin').value;
+      const mensajeError = document.getElementById('mensajeError');
+      const resultadoDiv = document.getElementById('resultado');
+
+      mensajeError.textContent = '';
+      resultadoDiv.style.display = 'none';
+      resultadoDiv.textContent = '';
+
+      if (!inicioInput || !finInput) {
+        mensajeError.textContent = 'Por favor, ingresa ambas fechas.';
+        return;
+      }
+
+      const inicio = new Date(inicioInput);
+      const fin = new Date(finInput);
+
+      if (fin < inicio) {
+        mensajeError.textContent = 'La fecha final no puede ser anterior a la fecha de inicio.';
+        return;
+      }
+
+      let diasClase = 0;
+      let fechaActual = new Date(inicio);
+
+      while (fechaActual <= fin) {
+        const diaSemana = fechaActual.getDay(); // 0=Domingo, 1=Lunes, ..., 6=Sábado
+        if (diaSemana !== 0) { // Excluimos únicamente los domingos
+          diasClase++;
+        }
+        fechaActual.setDate(fechaActual.getDate() + 1);
+      }
+
+      resultadoDiv.style.display = 'block';
+      resultadoDiv.textContent = `Entre el ${inicioInput} y el ${finInput} hay ${diasClase} días de clase (lunes a sábado).`;
+    }
+  </script>
+</body>
+</html>
