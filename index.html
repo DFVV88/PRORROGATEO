@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Calculadora de Clases y Costo - Grupo de Estudio Nostradamus</title>
+  <title>Calculadora de Clases y Costo - Nostradamus</title>
 
   <style>
     :root {
@@ -30,7 +30,7 @@
       padding: 24px 26px;
       border-radius: 16px;
       box-shadow: var(--shadow-soft);
-      max-width: 460px;
+      max-width: 480px;
       width: 100%;
       text-align: center;
     }
@@ -91,6 +91,7 @@
       font-size: 15px;
       color: var(--color-secondary);
       text-align: left;
+      white-space: pre-line;
     }
 
     .error {
@@ -104,7 +105,6 @@
 
   <div class="container">
 
-    <!-- Logo oficial -->
     <img src="LOGO-GNOSTRADAMUS-2023 - copia.png" class="logo">
 
     <h1>Calculadora de Días de Clase y Costo</h1>
@@ -137,7 +137,6 @@
       mensajeError.textContent = '';
       resultadoDiv.style.display = 'none';
 
-      // Validaciones
       if (!inicioInput || !finInput) {
         mensajeError.textContent = 'Por favor, ingresa ambas fechas.';
         return;
@@ -160,19 +159,38 @@
       let diasClase = 0;
       let fechaActual = new Date(inicio);
 
+      let clasesPorMes = {};
+
       while (fechaActual <= fin) {
-        if (fechaActual.getDay() !== 0) diasClase++; // Excluye domingos
+        if (fechaActual.getDay() !== 0) { // Excluye domingos
+          diasClase++;
+
+          // Construir clave Año-Mes
+          let year = fechaActual.getFullYear();
+          let month = fechaActual.toLocaleString('es-ES', { month: 'long' });
+
+          let clave = `${month.toUpperCase()} ${year}`;
+
+          if (!clasesPorMes[clave]) clasesPorMes[clave] = 0;
+          clasesPorMes[clave]++;
+        }
         fechaActual.setDate(fechaActual.getDate() + 1);
       }
 
       const total = diasClase * costoDia;
 
+      // Construir texto con desglose por mes
+      let desglose = "📅 *CLASES POR MES*\n\n";
+      for (let m in clasesPorMes) {
+        desglose += `${m}: ${clasesPorMes[m]} clases\n`;
+      }
+
       resultadoDiv.style.display = 'block';
-      resultadoDiv.innerHTML = `
-        <strong>Días de clase:</strong> ${diasClase}<br>
-        <strong>Costo por día:</strong> S/ ${costoDia.toFixed(2)}<br><br>
-        <strong>Total a pagar:</strong> <span style="color:#008B8F;">S/ ${total.toFixed(2)}</span>
-      `;
+      resultadoDiv.textContent =
+        `${desglose}\n` +
+        `TOTAL DE CLASES: ${diasClase}\n` +
+        `Costo por día: S/ ${costoDia.toFixed(2)}\n\n` +
+        `💰 TOTAL A PAGAR: S/ ${total.toFixed(2)}`;
     }
   </script>
 
